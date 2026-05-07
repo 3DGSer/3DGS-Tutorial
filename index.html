@@ -1,0 +1,443 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Gaussian Splatting Tutorial</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+
+    <div class="logo">
+      <span class="logo-main" data-en="3D Gaussian Splatting" data-ja="3Dガウシアン スプラッティング">3D Gaussian Splatting</span>
+      <span class="logo-sub" data-en="Tutorial" data-ja="チュートリアル">Tutorial</span>
+    </div>
+
+    <nav class="nav">
+      <a href="#" class="nav-item active" data-section="rs-ls">RealityScan + LitchFeld Studio</a>
+      <a href="#" class="nav-item" data-section="rs-brush">RealityScan + Brush</a>
+      <a href="#" class="nav-item" data-section="meta-ls">Metashape + LitchFeld Studio</a>
+      <a href="#" class="nav-item" data-section="meta-brush">Metashape + Brush</a>
+      <a href="#" class="nav-item" data-section="capture-tips">
+        <span data-en="Photo Capture Tips" data-ja="撮影のコツ">Photo Capture Tips</span>
+      </a>
+      <a href="#" class="nav-item" data-section="resources">
+        <span data-en="Resources" data-ja="リソース">Resources</span>
+      </a>
+    </nav>
+
+    <div class="controls">
+      <button class="icon-btn theme-toggle" aria-label="Toggle theme">
+        ☀
+      </button>
+
+      <button class="icon-btn lang-toggle" aria-label="Toggle language">
+        <span class="lang-label-en">EN</span>
+        <span class="lang-label-ja">JP</span>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<main class="main">
+
+<script>
+const workflows = [
+  {
+    id: "rs-ls",
+    title: "RealityScan + LitchFeld Studio",
+    folder: "1. RS+LS"
+  },
+  {
+    id: "rs-brush",
+    title: "RealityScan + Brush",
+    folder: "2. RS+Brush"
+  },
+  {
+    id: "meta-ls",
+    title: "Metashape + LitchFeld Studio",
+    folder: "3. Metashape+LS"
+  },
+  {
+    id: "meta-brush",
+    title: "Metashape + Brush",
+    folder: "4. Metashape+Brush"
+  }
+];
+
+
+const workflowDescriptions = {
+  "rs-ls": [
+    "Import photos in JPEG/PNG/HEIC format into RealityScan. Use 50–600 photos for one model.",
+    "Run photo alignment in RealityScan and verify camera registration.",
+    "Export the project as COLMAP format with undistorted images enabled.",
+    "Import the COLMAP folder into LitchFeld Studio and load the dataset.",
+    "Configure 3DGS training parameters and start training.",
+    "Export the trained model as PLY or SOG format.",
+    "Upload/share the model and explore the final 3DGS result."
+  ],
+
+  "rs-brush": [
+    "Import photos in JPEG/PNG/HEIC format into RealityScan. Use 50–600 photos for one model.",
+    "Run photo alignment in RealityScan and verify camera registration.",
+    "Export the project as COLMAP format with undistorted images enabled.",
+    "Import the COLMAP dataset folder into Brush.",
+    "Configure 3DGS training parameters and start training.",
+    "Export the trained model as PLY format.",
+    "Upload/share the model and explore the final 3DGS result."
+  ],
+
+  "meta-ls": [
+    "Import photos in JPEG/PNG format into Metashape.",
+    "Run photo alignment in Metashape.",
+    "Export cameras/project as COLMAP format.",
+    "Import the COLMAP folder into LitchFeld Studio and load the dataset.",
+    "Configure 3DGS training parameters and start training.",
+    "Export the trained model as PLY or SOG format.",
+    "Upload/share the model and explore the final 3DGS result."
+  ],
+
+  "meta-brush": [
+    "Import photos in JPEG/PNG format into Metashape.",
+    "Run photo alignment in Metashape.",
+    "Export cameras/project as COLMAP format.",
+    "Import the COLMAP dataset folder into Brush.",
+    "Configure 3DGS training parameters and start training.",
+    "Export the trained model as PLY format.",
+    "Upload/share the model and explore the final 3DGS result."
+  ]
+};
+
+const stepsJA = [
+  "写真をインポートして整理します。",
+  "画像を位置合わせしてカメラ位置を確認します。",
+  "COLMAP形式で書き出します。",
+  "データセットを読み込みます。",
+  "3DGSトレーニングを開始します。",
+  "モデルを書き出します。",
+  "モデルを共有して確認します。"
+];
+
+
+document.write(workflows.map((workflow, workflowIndex) => `
+<div class="workflow ${workflowIndex === 0 ? 'active' : ''}" id="${workflow.id}">
+  <div class="workflow-header">
+    <span class="workflow-index">${String(workflowIndex + 1).padStart(2,'0')}</span>
+    <h2 class="workflow-title">${workflow.title}</h2>
+  </div>
+
+  <div class="steps-list">
+    ${Array.from({length: 7}, (_, i) => `
+      <div class="step">
+        <div class="step-meta">
+          <span class="step-num">STEP ${String(i + 1).padStart(2,'0')}</span>
+        </div>
+
+        <div class="step-body">
+          <div class="step-video-wrap">
+            <video
+              src="./videos/${workflow.folder}/${i + 1}.mp4"
+              controls
+              preload="${i === 0 ? 'auto' : 'none'}"
+              loading="lazy"
+              playsinline>
+            </video>
+          </div>
+
+          <p class="step-desc"
+             data-en="${workflowDescriptions[workflow.id][i]}"
+             data-ja="${stepsJA[i]}">
+             ${workflowDescriptions[workflow.id][i]}
+          </p>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+</div>
+`).join(''));
+</script>
+
+<div class="workflow" id="capture-tips">
+  <div class="workflow-header">
+    <span class="workflow-index">05</span>
+    <h2 class="workflow-title" data-en="Photo Capture Tips" data-ja="フォトグラメトリ撮影のコツ">
+      Photo Capture Tips
+    </h2>
+  </div>
+
+  <div class="tips-grid">
+
+    <div class="tip-card">
+      <h3 data-en="Lighting" data-ja="ライティング">Lighting</h3>
+      
+    </div>
+
+    <div class="tip-card">
+      <h3 data-en="Overlap" data-ja="写真の重なり">Overlap</h3>
+      
+    </div>
+
+    <div class="tip-card">
+      <h3 data-en="Camera Movement" data-ja="カメラ移動">Camera Movement</h3>
+      
+    </div>
+
+    <div class="tip-card">
+      <h3 data-en="Blur" data-ja="ブレ防止">Blur</h3>
+      
+    </div>
+
+    <div class="tip-card">
+      <h3 data-en="Coverage" data-ja="カバー範囲">Coverage</h3>
+      
+    </div>
+
+    <div class="tip-card">
+      <h3 data-en="Texture Detail" data-ja="表面ディテール">Texture Detail</h3>
+      
+    </div>
+
+  </div>
+</div>
+
+
+<div class="workflow" id="resources">
+  <div class="workflow-header">
+    <span class="workflow-index">06</span>
+    <h2 class="workflow-title" data-en="Resources" data-ja="リソース">
+      Resources
+    </h2>
+  </div>
+
+  
+<div class="os-table-wrap">
+
+  <h3 class="os-table-title"
+      data-en="Software Availability for each Operating System"
+      data-ja="各OSで利用可能なソフトウェア">
+      Software Availability for each Operating System
+  </h3>
+
+  <div class="os-table-container">
+    <table class="os-table">
+
+      <thead>
+        <tr>
+          <th data-en="Software" data-ja="ソフトウェア">Software</th>
+          <th>Windows OS</th>
+          <th>Mac OS</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>RealityScan</td>
+          <td>○</td>
+          <td>✕</td>
+        </tr>
+
+        <tr>
+          <td>Metashape</td>
+          <td>○</td>
+          <td>○</td>
+        </tr>
+
+        <tr>
+          <td>LichtFeld Studio</td>
+          <td>○</td>
+          <td>✕</td>
+        </tr>
+
+        <tr>
+          <td>Brush</td>
+          <td>○</td>
+          <td>○</td>
+        </tr>
+
+      </tbody>
+
+    </table>
+  </div>
+
+</div>
+
+
+  <div class="resource-list">
+
+    <div class="resource-card">
+      <div class="resource-info">
+        <a class="resource-title"
+           href="https://www.realityscan.com/"
+           target="_blank">
+           RealityScan
+        </a>
+
+        
+      </div>
+
+      <div class="resource-buttons">
+        <a href="https://www.realityscan.com/download"
+           target="_blank"
+           class="download-btn">
+           Download
+        </a>
+      </div>
+    </div>
+
+    <div class="resource-card">
+      <div class="resource-info">
+        <a class="resource-title"
+           href="https://www.agisoftmetashape.com/"
+           target="_blank">
+           Agisoft Metashape
+        </a>
+
+        
+      </div>
+
+      <div class="resource-buttons">
+        <a href="https://www.agisoft.com/downloads/installer/"
+           target="_blank"
+           class="download-btn">
+           Download
+        </a>
+      </div>
+    </div>
+
+    <div class="resource-card">
+      <div class="resource-info">
+        <a class="resource-title"
+           href="https://lichtfeld.io/"
+           target="_blank">
+           LichtFeld Studio
+        </a>
+
+        
+      </div>
+
+      <div class="resource-buttons">
+        <a href="https://qu365-my.sharepoint.com/:u:/g/personal/abdulhai_mahmoud_ahmed_243_s_kyushu-u_ac_jp/IQCjsNlLoe_kT4451ZcMIspMAQ-U6jxWCvrT0eyJqCIOZPI?e=E5wKyp"
+           target="_blank"
+           class="download-btn">
+           Download
+        </a>
+      </div>
+    </div>
+
+    <div class="resource-card">
+      <div class="resource-info">
+        <a class="resource-title"
+           href="https://github.com/ArthurBrussee/brush"
+           target="_blank">
+           Brush
+        </a>
+
+        
+      </div>
+
+      <div class="resource-buttons">
+        <a href="https://qu365-my.sharepoint.com/:u:/g/personal/abdulhai_mahmoud_ahmed_243_s_kyushu-u_ac_jp/IQCOJW1YAow1QZJrZ7LaNcaaAXCp-tlcUhje7YbHk4GnzWc?e=hvmVRn"
+           target="_blank"
+           class="download-btn">
+           Windows
+        </a>
+
+        <a href="https://qu365-my.sharepoint.com/:u:/g/personal/abdulhai_mahmoud_ahmed_243_s_kyushu-u_ac_jp/IQCfMlv-JYKASqsni6mlFR0hAd7ZuIACnibcCOp8YHJ6n7A?e=2e0B2q"
+           target="_blank"
+           class="download-btn">
+           Mac
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+</main>
+
+<footer class="footer">
+  <span class="footer-text"
+        data-en="3D Gaussian Splatting Tutorial"
+        data-ja="3Dガウシアン スプラッティング チュートリアル">
+    3D Gaussian Splatting Tutorial
+  </span>
+</footer>
+
+<script>
+const html = document.documentElement;
+
+document.querySelector('.theme-toggle').addEventListener('click', () => {
+  html.setAttribute(
+    'data-theme',
+    html.getAttribute('data-theme') === 'light' ? 'dark' : 'light'
+  );
+});
+
+document.querySelector('.lang-toggle').addEventListener('click', () => {
+  const next = html.getAttribute('data-lang') === 'en' ? 'ja' : 'en';
+  html.setAttribute('data-lang', next);
+
+  document.querySelectorAll('[data-en][data-ja]').forEach(el => {
+    el.textContent = el.getAttribute('data-' + next);
+  });
+});
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', e => {
+    e.preventDefault();
+
+    document.querySelectorAll('.nav-item').forEach(n => {
+      n.classList.remove('active');
+    });
+
+    item.classList.add('active');
+
+    const id = item.getAttribute('data-section');
+
+    document.querySelectorAll('.workflow').forEach(w => {
+      w.classList.toggle('active', w.id === id);
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const videos = document.querySelectorAll('video');
+
+  videos.forEach((video, index) => {
+    if (index !== 0) {
+      video.preload = 'none';
+    }
+  });
+
+  videos.forEach((video) => {
+    video.addEventListener('mouseenter', () => {
+      if (video.preload === 'none') {
+        video.preload = 'metadata';
+        video.load();
+      }
+    });
+
+    video.addEventListener('play', () => {
+      if (video.preload === 'none') {
+        video.preload = 'auto';
+        video.load();
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
